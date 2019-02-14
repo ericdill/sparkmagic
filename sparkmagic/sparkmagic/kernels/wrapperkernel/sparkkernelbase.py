@@ -26,7 +26,8 @@ class SparkKernelBase(IPythonKernel):
 
         super(SparkKernelBase, self).__init__(**kwargs)
 
-        # Create a spark log
+        # Create a spark log. Should probably just remove the SparkLog class and directly
+        # initalize its parent class.
         self.logger = SparkLog(u"{}_jupyter_kernel".format(self.session_language))
         self._fatal_error = None
         # ipython_display is something used locally to the sparkmagic code. It is not an
@@ -47,7 +48,11 @@ class SparkKernelBase(IPythonKernel):
             # initialize the cell magics
             self._load_magics_extension()
             # Execute the "%%_do_not_call_change_language -l {self.language}" cell magic on behalf
-            # of the user
+            # of the user. This seems to impact the REST calls to Livy. Specifically, there is
+            # a function in sparkmagic/utils/configuration.py "get_livy_kind" that uses the
+            # "language" attribute hanging off of the KernelMagics class to determine what the
+            # value for the "kind" REST API parameter should be. The self.session_language attribute
+            # is ALSO stored on the KernelMagics class as the self.language attribute.
             self._change_language()
             if conf.use_auto_viz():
                 self._register_auto_viz()

@@ -56,7 +56,17 @@ _with_override = with_override(d, path)
 
 # Helpers
 
+# language_map = {LANG_SCALA: SESSION_KIND_SPARK,
+#                 LANG_PYTHON: SESSION_KIND_PYSPARK,
+#                 LANG_PYTHON3: SESSION_KIND_PYSPARK3,
+#                 LANG_R: SESSION_KIND_SPARKR}
 def get_livy_kind(language):
+    # You could turn this whole function into just a dict lookup instead of if/elif/else
+    # session_kind = language_map.get(language)
+    # if session_kind is None:
+    #     raise BadUserConfigurationException("Cannot get session kind for {}.".format(language))
+    # return session_kind
+
     if language == LANG_SCALA:
         return SESSION_KIND_SPARK
     elif language == LANG_PYTHON:
@@ -67,7 +77,6 @@ def get_livy_kind(language):
         return SESSION_KIND_SPARKR
     else:
         raise BadUserConfigurationException("Cannot get session kind for {}.".format(language))
-
 
 def get_auth_value(username, password):
     if username == '' and password == '':
