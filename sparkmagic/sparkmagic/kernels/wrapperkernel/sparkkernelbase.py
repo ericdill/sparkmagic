@@ -26,10 +26,12 @@ class SparkKernelBase(IPythonKernel):
 
         super(SparkKernelBase, self).__init__(**kwargs)
 
+        # Create a spark log
         self.logger = SparkLog(u"{}_jupyter_kernel".format(self.session_language))
         self._fatal_error = None
         # ipython_display is something used locally to the sparkmagic code. It is not an
-        # override of some built-in functionality to the IPythonKernel base class
+        # override of some built-in functionality to the IPythonKernel base class. It is, however
+        # an unusual wrapper around the global InteractiveShell instance
         self.ipython_display = IpythonDisplay()
 
         if user_code_parser is None:
@@ -41,7 +43,11 @@ class SparkKernelBase(IPythonKernel):
         requests.packages.urllib3.disable_warnings()
 
         if not kwargs.get("testing", False):
+            # Execute the '%load_ext sparkmagic.kernels' cell magic on behalf of the user to
+            # initialize the cell magics
             self._load_magics_extension()
+            # Execute the "%%_do_not_call_change_language -l {self.language}" cell magic on behalf
+            # of the user
             self._change_language()
             if conf.use_auto_viz():
                 self._register_auto_viz()

@@ -25,6 +25,12 @@ from sparkmagic.livyclientlib.exceptions import handle_expected_exceptions, wrap
 
 
 def _event(f):
+    """Decorator that logs some information at the start and end of a
+
+    Suggestion: Make _event Python logging aware. Then, all of the `_spark_events` machinery
+    can just go away. This would allow us to remove well over 100 lines of code from this code base.
+    Possibly more
+    """
     def wrapped(self, *args, **kwargs):
         guid = self._generate_uuid()
         self._spark_events.emit_magic_execution_start_event(f.__name__, get_livy_kind(self.language), guid)
@@ -343,7 +349,12 @@ class KernelMagics(SparkMagicBase):
     @cell_magic
     @argument("-l", "--language", type=str, help="Language to use.")
     def _do_not_call_change_language(self, line, cell="", local_ns=None):
+        """This function is called "_do_not_call" because the user should never execute this
+        cell magic themselves. This is an internal cell magic to be used programmatically by
+        other parts of this codebase"""
+        # Parse the cell magic line
         args = parse_argstring_or_throw(self._do_not_call_change_language, line)
+
         language = args.language.lower()
 
         if language not in LANGS_SUPPORTED:
