@@ -48,7 +48,7 @@ class KernelMagics(SparkMagicBase):
     def __init__(self, shell, data=None, spark_events=None):
         # You must call the parent constructor
         super(KernelMagics, self).__init__(shell, data)
-        
+
         self.session_name = u"session_name"
         self.session_started = False
 
@@ -60,12 +60,13 @@ class KernelMagics(SparkMagicBase):
         if spark_events is None:
             spark_events = SparkEvents()
         self._spark_events = spark_events
+        print("KernelMagics class initialized")
 
-    @magic_arguments()
-    @cell_magic
-    @wrap_unexpected_exceptions
-    @handle_expected_exceptions
-    @_event
+    @magic_arguments() # IPython decorator
+    @cell_magic # IPython decorator
+    @wrap_unexpected_exceptions # sparkmagic decorator
+    @handle_expected_exceptions # sparkmagic decorator
+    @_event # sparkmagic decorator
     def help(self, line, cell="", local_ns=None):
         parse_argstring_or_throw(self.help, line)
         self._assure_cell_body_is_empty(KernelMagics.help.__name__, cell)
@@ -243,7 +244,7 @@ class KernelMagics(SparkMagicBase):
     def sql(self, line, cell="", local_ns=None):
         if self._do_not_call_start_session(""):
             args = parse_argstring_or_throw(self.sql, line)
-            
+
             coerce = get_coerce_value(args.coerce)
 
             return self.execute_sqlquery(cell, args.samplemethod, args.maxrows, args.samplefraction,

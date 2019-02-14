@@ -10,9 +10,14 @@ def get_spark_events_handler():
     """
     Create an instance from the handler mentioned in the config file.
     """
+    # The default "events_handler_class" is `hdijupyterutils.eventshandler.EventsHandler`
+    # So module = 'hdijupyterutils.eventshandler and class_name = EventsHandler
+    # Apparently all of this is an elaborate scheme around using Python logging.
     module, class_name = conf.events_handler_class().rsplit('.', 1)
     events_handler_module = importlib.import_module(module)
     events_handler = getattr(events_handler_module, class_name)
+    # Read the logging configuration out of the config file. Or maybe the default value
+    # hardcoded in the configuration.py file under the "def logging_config()" function
     handler = events_handler(constants.MAGICS_LOGGER_NAME, conf.logging_config())
     return handler
 
@@ -21,7 +26,7 @@ class SparkEvents(Events):
     def __init__(self):
         handler = get_spark_events_handler()
         super(SparkEvents, self).__init__(handler)
-    
+
 
     def emit_library_loaded_event(self):
         event_name = constants.LIBRARY_LOADED_EVENT

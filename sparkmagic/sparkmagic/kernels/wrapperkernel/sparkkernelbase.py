@@ -12,8 +12,8 @@ from sparkmagic.kernels.wrapperkernel.usercodeparser import UserCodeParser
 
 
 class SparkKernelBase(IPythonKernel):
-    def __init__(self, implementation, implementation_version, language, language_version, language_info,
-                 session_language, user_code_parser=None, **kwargs):
+    def __init__(self, implementation, implementation_version, language, language_version,
+                 language_info, session_language, user_code_parser=None, **kwargs):
         # Required by Jupyter - Override
         self.implementation = implementation
         self.implementation_version = implementation_version
@@ -28,6 +28,8 @@ class SparkKernelBase(IPythonKernel):
 
         self.logger = SparkLog(u"{}_jupyter_kernel".format(self.session_language))
         self._fatal_error = None
+        # ipython_display is something used locally to the sparkmagic code. It is not an
+        # override of some built-in functionality to the IPythonKernel base class
         self.ipython_display = IpythonDisplay()
 
         if user_code_parser is None:
@@ -80,10 +82,10 @@ class SparkKernelBase(IPythonKernel):
     def _register_auto_viz(self):
         from sparkmagic.utils.sparkevents import get_spark_events_handler
         import autovizwidget.utils.configuration as c
-        
+
         handler = get_spark_events_handler()
         c.override("events_handler", handler)
-        
+
         register_auto_viz_code = """from autovizwidget.widget.utils import display_dataframe
 ip = get_ipython()
 ip.display_formatter.ipython_display_formatter.for_type_by_name('pandas.core.frame', 'DataFrame', display_dataframe)"""

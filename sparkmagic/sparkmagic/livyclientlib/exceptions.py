@@ -46,18 +46,23 @@ class BadUserConfigurationException(LivyClientLibException):
 class BadUserDataException(LivyClientLibException):
     """An exception that is thrown when data provided by the user is invalid
     in some way."""
-    
+
 
 class SqlContextNotFoundException(LivyClientLibException):
     """Exception that is thrown when the SQL context is not found."""
 
 # == DECORATORS FOR EXCEPTION HANDLING ==
-EXPECTED_EXCEPTIONS = [BadUserConfigurationException, BadUserDataException, LivyUnexpectedStatusException, SqlContextNotFoundException,
-                       HttpClientException, LivyClientTimeoutException, SessionManagementException]
+EXPECTED_EXCEPTIONS = [BadUserConfigurationException,
+                       BadUserDataException,
+                       LivyUnexpectedStatusException,
+                       SqlContextNotFoundException,
+                       HttpClientException,
+                       LivyClientTimeoutException,
+                       SessionManagementException]
 
 
 def handle_expected_exceptions(f):
-    """A decorator that handles expected exceptions. Self can be any object with
+    """A class function decorator that handles expected exceptions. Self can be any object with
     an "ipython_display" attribute.
     Usage:
     @handle_expected_exceptions

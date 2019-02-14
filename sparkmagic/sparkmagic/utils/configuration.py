@@ -15,18 +15,30 @@ from sparkmagic.livyclientlib.exceptions import BadUserConfigurationException
 import sparkmagic.utils.constants as constants
 
 
+# This whole module should be rewritten with traitlets
+
+# `d` here is a module-level global of configurations that takes runtime precedence over what the
+# user has given with the config.json file which takes precedence over the hard-coded values
+# in this module. Precedence: `d` > user configs > defaults in this file
 d = {}
+
+# The full path to the sparkmagic configuration file. It gets pulled from the environment
+# or has some default values
 path = join_paths(HOME_PATH, CONFIG_FILE)
 
-    
+
 def override(config, value):
     _override(d, path, config, value)
 
 
 def override_all(obj):
+    # This function does not appear to be used
     _override_all(d, obj)
 
 
+# _with_override is a decorator that uses the name of the function that it is wrapping
+# to pull out the default configuration parameter that is set in the sparkmagic config.json
+# file. For example, see the function below called "session_configs"
 _with_override = with_override(d, path)
 
 
@@ -48,19 +60,25 @@ def get_livy_kind(language):
 def get_auth_value(username, password):
     if username == '' and password == '':
         return constants.NO_AUTH
-    
+
     return constants.AUTH_BASIC
 
 
 # Configs
 
- 
+
 def get_session_properties(language):
     properties = copy.deepcopy(session_configs())
     properties[LIVY_KIND_PARAM] = get_livy_kind(language)
     return properties
 
 
+# The _with_override decorator uses the name of the function, in this case "session_configs"
+# as the key to pull out the configuration value set in the sparkmagic config.json file.
+# Executing this function is going to read the config.json file, look for the "session_configs"
+# key in that configuration file and return the value of that key. If the key, in this case
+# "session_configs" is not specified in the sparkmagic configuration file then the return value
+# as defined below will be used as the default.
 @_with_override
 def session_configs():
     return {}
@@ -69,8 +87,8 @@ def session_configs():
 @_with_override
 def kernel_python_credentials():
     return {u'username': u'', u'base64_password': u'', u'url': u'http://localhost:8998', u'auth': constants.NO_AUTH}
-    
-    
+
+
 def base64_kernel_python_credentials():
     return _credentials_override(kernel_python_credentials)
 
@@ -90,7 +108,7 @@ def kernel_scala_credentials():
     return {u'username': u'', u'base64_password': u'', u'url': u'http://localhost:8998', u'auth': constants.NO_AUTH}
 
 
-def base64_kernel_scala_credentials():        
+def base64_kernel_scala_credentials():
     return _credentials_override(kernel_scala_credentials)
 
 @_with_override
@@ -198,7 +216,7 @@ def pyspark_dataframe_encoding():
 @_with_override
 def heartbeat_refresh_seconds():
     return 30
-    
+
 
 @_with_override
 def heartbeat_retry_seconds():

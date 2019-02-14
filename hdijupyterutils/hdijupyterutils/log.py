@@ -10,8 +10,13 @@ from .constants import LOGGING_CONFIG_CLASS_NAME
 class Log(object):
     """Logger for magics. A small wrapper class around the configured logger described in the configuration file"""
     def __init__(self, logger_name, logging_config, caller_name):
+        # As invoked by the EventsHandler class, the parameters are as follows:
+        # logger_name: "magicsLogger"
+        # logging_config: The configuration out of the configuration.py file or the config.json
+        #                 file. The json config file has higher precedence.
+        # caller_name: "EventsHandler"
         logging.config.dictConfig(logging_config)
-        
+
         assert caller_name is not None
         self._caller_name = caller_name
         self.logger_name = logger_name
@@ -33,6 +38,9 @@ class Log(object):
         return u'{}\t{}'.format(self._caller_name, message)
 
 
+# This logging_config function is literally identical to the one in the sparkmagic
+# configuration py file: sparkmagic/sparkmagic/utils/configuration.py. Even has the same
+# name "logging_config". It appears to be used only in the test suite.
 def logging_config():
     return {
         u"version": 1,
@@ -56,4 +64,4 @@ def logging_config():
                 u"propagate": 0
             }
         }
-    }    
+    }

@@ -9,8 +9,12 @@ class UserCodeParser(object):
     # For example, the %%info magic has no cell body input, i.e. it is incorrect to call
     #    %%info
     #    some_input
-    _magics_with_no_cell_body = [i.__name__ for i in [KernelMagics.info, KernelMagics.logs, KernelMagics.cleanup,
-                                                      KernelMagics.delete, KernelMagics.help, KernelMagics.spark]]
+    _magics_with_no_cell_body = [i.__name__ for i in [KernelMagics.info,
+                                                      KernelMagics.logs,
+                                                      KernelMagics.cleanup,
+                                                      KernelMagics.delete,
+                                                      KernelMagics.help,
+                                                      KernelMagics.spark]]
 
     def get_code_to_run(self, code):
         try:
