@@ -27,12 +27,24 @@ d = {}
 path = join_paths(HOME_PATH, CONFIG_FILE)
 
 
+
 def override(config, value):
+    """Code in other modules can call in to the configuration via `override` to set a config value
+    that takes highest precedence. Preference order:
+    1. Values set via `override`
+    2. Values set in the sparkmagic configuration file defined by `path`
+    3. Values set in the default functions inside of this configuration.py module
+
+    Parameters
+    ----------
+    config: str, configuration key
+    value: object, value for `config` key
+    """
     _override(d, path, config, value)
 
 
 def override_all(obj):
-    # This function does not appear to be used
+    # This function does not appear to be used anywhere in this code base
     _override_all(d, obj)
 
 

@@ -20,3 +20,22 @@ class MagicsFileHandler(logging.FileHandler):
             super(MagicsFileHandler, self).__init__(
                 filename=join_paths(directory.path, log_file_name), **kwargs)
 
+# Suggest simplifying this __init__ function to be something more like this:
+
+    # def __init__(self, **kwargs):
+    #     if 'filename' not in kwargs:
+    #         # If we're not explicitly given a log filename then we construct it from the
+    #         # configuration
+    #         magics_home_path = kwargs.pop(u"home_path")
+    #         logs_dir = os.path.join(magics_home_path, 'logs')
+    #         # Ensure that our directory exists.
+    #         os.makedirs(logs_dir)
+
+    #         # Format the log file name and its full path
+    #         log_file_name = "log_{}.log".format(get_instance_id())
+    #         log_file = os.path.join(logs_dir, log_file_name)
+    #         kwargs['filename'] = log_file
+
+    #     super(MagicsFileHandler, self).__init__(**kwargs)
+
+
