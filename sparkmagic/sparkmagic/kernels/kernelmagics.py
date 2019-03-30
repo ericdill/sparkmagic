@@ -23,6 +23,8 @@ from sparkmagic.magics.sparkmagicsbase import SparkMagicBase
 from sparkmagic.livyclientlib.exceptions import handle_expected_exceptions, wrap_unexpected_exceptions, \
     BadUserDataException
 
+import traceback
+
 
 def _event(f):
     """Decorator that logs some information at the start and end of a
@@ -192,6 +194,8 @@ class KernelMagics(SparkMagicBase):
     @_event
     def configure(self, line, cell="", local_ns=None):
         try:
+            # TODO: I wonder if it would be possible to first execute the cell and then pass it in
+            # as JSON. Then the user could be a bit more programmatic with the configuration cell
             dictionary = json.loads(cell)
         except ValueError:
             self.ipython_display.send_error(u"Could not parse JSON object from input '{}'".format(cell))
@@ -294,7 +298,7 @@ class KernelMagics(SparkMagicBase):
             return
 
         if args.force:
-            # Don't override built-ins like "id". This can cause really weird and hard-to-debug bugs
+            # Don't override built-ins like "id". This can cause really weird and hard-to-debug
             id = self.spark_controller.get_session_id_for_client(self.session_name)
             if session == id:
                 self.ipython_display.send_error(u"Cannot delete this kernel's session ({}). Specify a different session,"
@@ -315,6 +319,9 @@ class KernelMagics(SparkMagicBase):
         # exceptions when starting the session.
 
         if self.fatal_error:
+            # This is why you need to restart the kernel on a failure. I wonder if it's possible
+            # to deal with this fatal_error_message in a better way and then let the user
+            # create a new Yarn app without making them restart the kernel?
             self.ipython_display.send_error(self.fatal_error_message)
             return False
 
@@ -326,8 +333,11 @@ class KernelMagics(SparkMagicBase):
             try:
                 self.spark_controller.add_session(self.session_name, self.endpoint, skip, properties)
             except Exception as e:
+                # Fatal error will only get set on session startup. Consider changing this
+                # mechanism to be more friendly to the user.
                 self.fatal_error = True
                 self.fatal_error_message = conf.fatal_error_suggestion().format(e)
+                self.logger.error(traceback.format_exc())
                 self.logger.error(u"Error creating session: {}".format(e))
                 self.ipython_display.send_error(self.fatal_error_message)
                 return False

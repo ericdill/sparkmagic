@@ -30,6 +30,7 @@ class SessionManager(object):
         self._sessions[name] = session
 
     def get_any_session(self):
+        # What is the use case of this function? This seems like a very strange UX.
         number_of_sessions = len(self._sessions)
         if number_of_sessions == 1:
             key = self.get_sessions_list()[0]
@@ -39,7 +40,7 @@ class SessionManager(object):
         else:
             raise SessionManagementException(u"Please specify the client to use. Possible sessions are {}".format(
                 self.get_sessions_list()))
-        
+
     def get_session(self, name):
         if name in self._sessions:
             return self._sessions[name]
@@ -57,14 +58,11 @@ class SessionManager(object):
                 return name
         return None
 
-    def delete_client(self, name):
-        self._remove_session(name)
-    
     def clean_up_all(self):
         for name in self.get_sessions_list():
-            self._remove_session(name)
+            self.delete_client(name)
 
-    def _remove_session(self, name):
+    def delete_client(self, name):
         if name in self.get_sessions_list():
             self._sessions[name].delete()
             del self._sessions[name]
