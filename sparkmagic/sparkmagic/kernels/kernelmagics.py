@@ -294,6 +294,7 @@ class KernelMagics(SparkMagicBase):
             return
 
         if args.force:
+            # Don't override built-ins like "id". This can cause really weird and hard-to-debug bugs
             id = self.spark_controller.get_session_id_for_client(self.session_name)
             if session == id:
                 self.ipython_display.send_error(u"Cannot delete this kernel's session ({}). Specify a different session,"
