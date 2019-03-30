@@ -58,11 +58,19 @@ class SessionManager(object):
                 return name
         return None
 
-    def clean_up_all(self):
-        for name in self.get_sessions_list():
-            self.delete_client(name)
-
     def delete_client(self, name):
+        self._remove_session(name)
+
+    def clean_up_all(self):
+        # Consider pushing this loop into the one place in this code
+        # base that calls this function: SparkController.cleanup. Then we
+        # can remove this function.
+        for name in self.get_sessions_list():
+            self._remove_session(name)
+
+    def _remove_session(self, name):
+        # Consider renaming this function to "delete_client" and removing
+        # the existing implementation of "delete_client"
         if name in self.get_sessions_list():
             self._sessions[name].delete()
             del self._sessions[name]
