@@ -38,6 +38,8 @@ class ReliableHttpClient(object):
         return self._headers
 
     def compose_url(self, relative_url):
+        # Pretty sure we should consider rewriting this url handling with
+        # something like urllib
         r_u = "/{}".format(relative_url.rstrip(u"/").lstrip(u"/"))
         return self._endpoint.url + r_u
 
