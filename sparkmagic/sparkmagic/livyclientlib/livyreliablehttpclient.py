@@ -62,7 +62,9 @@ class LivyReliableHttpClient(object):
     @staticmethod
     def _get_retry_policy():
         policy = conf.retry_policy()
-        
+        # Consider moving the remaining code in this function into the retry_policy
+        # in the conf module.
+
         if policy == LINEAR_RETRY:
             return LinearRetryPolicy(seconds_to_sleep=5, max_retries=5)
         elif policy == CONFIGURABLE_RETRY:

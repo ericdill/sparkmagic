@@ -20,6 +20,10 @@ class ReliableHttpClient(object):
         self._endpoint = endpoint
         self._headers = headers
         self._retry_policy = retry_policy
+        # Consider simplifying this a bit by just using local variables, then store
+        # as `self._auth = auth` after this if / elif block. Also consider storing
+        # `self._auth = None` when the auth is constants.NO_AUTH and then erroring if
+        # the value is something else.
         if self._endpoint.auth == constants.AUTH_KERBEROS:
             self._auth = HTTPKerberosAuth(mutual_authentication=REQUIRED)
         elif self._endpoint.auth == constants.AUTH_BASIC:
@@ -31,6 +35,7 @@ class ReliableHttpClient(object):
 
         self.verify_ssl = not conf.ignore_ssl_errors()
         if not self.verify_ssl:
+            # This seems more like a WARN level log than a DEBUG level log
             self.logger.debug(u"ATTENTION: Will ignore SSL errors. This might render you vulnerable to attacks.")
             requests.packages.urllib3.disable_warnings()
 
@@ -60,6 +65,21 @@ class ReliableHttpClient(object):
 
     def _send_request_helper(self, url, accepted_status_codes, function, data, retry_count):
         while True:
+            # Consider simplifying this try / except block. Generally you want to minimize the stuff
+            # in this try / except block:
+            # kwargs = {'url': url,
+            #         'headers': self._headers,
+            #         'verify': self.verify_ssl}
+            # if data is not None:
+            #     # Add in the data as a payload if we have it
+            #     kwargs['data'] = json.dumps(data)
+
+            # if self._endpoint.auth != constants.NO_AUTH:
+            #     # Make sure to use our defined auth, if we have it
+            #     kwargs['auth'] = self._auth
+            # try:
+            #     r = function(**kwargs)
+
             try:
                 if self._endpoint.auth == constants.NO_AUTH:
                     if data is None:
@@ -77,7 +97,6 @@ class ReliableHttpClient(object):
                 r = None
                 status = None
                 text = None
-
                 self.logger.error(u"Request to '{}' failed with '{}'".format(url, e))
             else:
                 error = False
@@ -86,6 +105,10 @@ class ReliableHttpClient(object):
 
             if error or status not in accepted_status_codes:
                 if self._retry_policy.should_retry(status, error, retry_count):
+                    self.logger.debug(
+                        "In retry loop for endpoint {}. Sleeping for {} seconds".format(
+                            url, self._retry_policy.seconds_to_sleep
+                        ))
                     sleep(self._retry_policy.seconds_to_sleep(retry_count))
                     retry_count += 1
                     continue
