@@ -12,6 +12,7 @@ from sparkmagic.livyclientlib.exceptions import BadUserDataException, DataFrameP
 
 
 def get_coerce_value(coerce):
+    # ...why.... Make the user just use a boolean...
     if coerce is not None:
         coerce = coerce.lower() in ("yes", "true", "t", "y", "1")
     return coerce
@@ -25,12 +26,12 @@ def parse_argstring_or_throw(magic_func, argstring, parse_argstring=parse_argstr
         return parse_argstring(magic_func, argstring)
     except UsageError as e:
         raise BadUserDataException(str(e))
-        
-        
+
+
 def coerce_pandas_df_to_numeric_datetime(df):
     for column_name in df.columns:
         coerced = False
-        
+
         if df[column_name].isnull().all():
             continue
 
@@ -62,7 +63,7 @@ def records_to_dataframe(records_text, kind, coerce=None):
 
         df = pd.DataFrame(data_array)
 
-        if len(data_array) > 0:    
+        if len(data_array) > 0:
             # This will assign the columns in the right order. If we simply did
             # df = pd.DataFrame(data_array, columns=data_array[0].keys())
             # in the code defining df, above, we could get an issue where the first element
@@ -73,7 +74,7 @@ def records_to_dataframe(records_text, kind, coerce=None):
                 if len(data.keys()) == len(df.columns):
                     df = df[list(data.keys())]
                     break
-                    
+
         if coerce is None:
             coerce = conf.coerce_dataframe()
         if coerce:

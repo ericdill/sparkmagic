@@ -37,7 +37,8 @@ class SparkMagicBase(Magics):
             spark_events = SparkEvents()
         spark_events.emit_library_loaded_event()
 
-    def execute_spark(self, cell, output_var, samplemethod, maxrows, samplefraction, session_name, coerce):
+    def execute_spark(self, cell, output_var, samplemethod, maxrows,
+                      samplefraction, session_name, coerce):
         (success, out) = self.spark_controller.run_command(Command(cell), session_name)
         if not success:
             self.ipython_display.send_error(out)

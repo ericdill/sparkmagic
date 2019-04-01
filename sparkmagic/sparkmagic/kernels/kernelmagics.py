@@ -57,6 +57,7 @@ class KernelMagics(SparkMagicBase):
         # You must call the parent constructor
         super(KernelMagics, self).__init__(shell, data)
 
+        # The session manager uses
         self.session_name = u"session_name"
         self.session_started = False
 
@@ -232,7 +233,11 @@ class KernelMagics(SparkMagicBase):
             args = parse_argstring_or_throw(self.spark, line)
 
             coerce = get_coerce_value(args.coerce)
-
+            # Why aren't we using self.session_name here for the session_name variable?
+            # (That's the second-to-last variable). By passing "None" as the session_name
+            # we are ultimately using the session_manager.get_any_session() function,
+            # which is also sort of an odd function. I think this whole code path could
+            # use some clean-up
             self.execute_spark(cell, args.output, args.samplemethod, args.maxrows, args.samplefraction, None, coerce)
         else:
             return

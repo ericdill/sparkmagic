@@ -109,7 +109,8 @@ class SparkStoreCommand(Command):
 
 
 
-    # Used only for unit testing
+    # If this is used only for unit testing, then why do we even need it?
+    # Used only for unit testing.
     def __eq__(self, other):
         return self.code == other.code and \
             self.samplemethod == other.samplemethod and \

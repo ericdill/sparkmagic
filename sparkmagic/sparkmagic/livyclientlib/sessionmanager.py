@@ -31,6 +31,7 @@ class SessionManager(object):
 
     def get_any_session(self):
         # What is the use case of this function? This seems like a very strange UX.
+        # This function should probably be called "get_the_session_if_only_one_exists"
         number_of_sessions = len(self._sessions)
         if number_of_sessions == 1:
             key = self.get_sessions_list()[0]

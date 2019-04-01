@@ -12,6 +12,7 @@ from .exceptions import LivyUnexpectedStatusException
 class Command(ObjectWithGuid):
     def __init__(self, code, spark_events=None):
         super(Command, self).__init__()
+        # Why are we dedenting code? This seems wrong...
         self.code = textwrap.dedent(code)
         self.logger = SparkLog(u"Command")
         if spark_events is None:
@@ -25,7 +26,8 @@ class Command(ObjectWithGuid):
         return not self == other
 
     def execute(self, session):
-        self._spark_events.emit_statement_execution_start_event(session.guid, session.kind, session.id, self.guid)
+        self._spark_events.emit_statement_execution_start_event(
+            session.guid, session.kind, session.id, self.guid)
         statement_id = -1
         try:
             session.wait_for_idle()
@@ -34,18 +36,22 @@ class Command(ObjectWithGuid):
             statement_id = response[u'id']
             output = self._get_statement_output(session, statement_id)
         except Exception as e:
-            self._spark_events.emit_statement_execution_end_event(session.guid, session.kind, session.id,
-                                                                  self.guid, statement_id, False, e.__class__.__name__,
-                                                                  str(e))
+            self._spark_events.emit_statement_execution_end_event(
+                session.guid, session.kind, session.id,
+                self.guid, statement_id, False, e.__class__.__name__,
+                str(e)
+            )
             raise
         else:
-            self._spark_events.emit_statement_execution_end_event(session.guid, session.kind, session.id,
-                                                                  self.guid, statement_id, True, "", "")
+            self._spark_events.emit_statement_execution_end_event(
+                session.guid, session.kind, session.id,
+                self.guid, statement_id, True, "", ""
+            )
             return output
 
     def _get_statement_output(self, session, statement_id):
         retries = 1
-        
+
         while True:
             statement = session.http_client.get_statement(session.id, statement_id)
             status = statement[u"state"].lower()
@@ -55,7 +61,7 @@ class Command(ObjectWithGuid):
             if status not in FINAL_STATEMENT_STATUS:
                 session.sleep(retries)
                 retries += 1
-            else:                
+            else:
                 statement_output = statement[u"output"]
 
                 if statement_output is None:

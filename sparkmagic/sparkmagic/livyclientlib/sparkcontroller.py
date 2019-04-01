@@ -10,6 +10,12 @@ from sparkmagic.utils.constants import MAGICS_LOGGER_NAME
 
 
 class SparkController(object):
+    """
+    This class seems to be where these three objects are combined to interact:
+    * LivySession
+    * code from the Jupyter notebook
+    *
+    """
     def __init__(self, ipython_display):
         self.logger = SparkLog(u"SparkController")
         self.ipython_display = ipython_display
@@ -65,7 +71,7 @@ class SparkController(object):
 
     def delete_session_by_id(self, endpoint, session_id):
         name = self.session_manager.get_session_name_by_id_endpoint(session_id, endpoint)
-        
+
         if name in self.session_manager.get_sessions_list():
             self.delete_session_by_name(name)
         else:
